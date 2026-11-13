@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>حسابات المقاولين</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d6b73">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#e9ecee; --card:#ffffff; --ink:#16232b; --mute:#5d6b74; --line:#cdd4d9;
+  --accent:#0d6b73; --accent-ink:#ffffff; --neg:#b3261e; --pos:#1b7a43; --bar:#16232b; --bar-ink:#f2f5f6;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#10181d; --card:#18232a; --ink:#e8eef1; --mute:#8fa0aa; --line:#2b3a43;
+        --accent:#3fb5bf; --accent-ink:#06191c; --neg:#ff8a80; --pos:#7bd69c; --bar:#0b1115; --bar-ink:#e8eef1;}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,"Noto Naskh Arabic",system-ui,sans-serif;font-size:16px}
+#app{max-width:640px;margin:0 auto;padding:0 14px 90px}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 8px}
+.top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+h1{font-size:19px;margin:0;flex:1;min-width:0}
+.mini{border:1.5px solid var(--line);background:var(--card);color:var(--mute);border-radius:8px;padding:6px 10px;font:inherit;font-size:13px}
+.tabs{display:flex;gap:6px}
+.tabs button{flex:1;padding:11px 6px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;font:inherit;font-weight:600}
+.tabs button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.ledger{background:var(--bar);color:var(--bar-ink);border-radius:12px;padding:14px;margin:10px 0}
+.ledger .big{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;direction:ltr;text-align:right}
+.ledger .lbl{font-size:13px;opacity:.75}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-top:12px}
+.grid div{border-top:1px solid rgba(255,255,255,.18);padding-top:7px}
+.grid .v{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;direction:ltr;text-align:right}
+.neg{color:var(--neg)} .pos{color:var(--pos)}
+.ledger .neg{color:#ff9d94} .ledger .pos{color:#8fe3ae}
+.row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;margin:8px 0;cursor:pointer}
+.row .t{flex:1;min-width:0}
+.row .n{font-weight:700}
+.row .s{font-size:13px;color:var(--mute)}
+.row .a{font-variant-numeric:tabular-nums;direction:ltr;font-weight:700;text-align:left}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0}
+.card h3{margin:0 0 10px;font-size:15px}
+label{display:block;font-size:13px;color:var(--mute);margin:8px 0 4px}
+input,select{width:100%;padding:12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{display:block;width:100%;padding:13px;border:0;border-radius:10px;background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:700;margin-top:12px}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.danger{background:transparent;color:var(--neg);border:1.5px solid var(--neg)}
+.back{background:none;border:0;color:var(--accent);font:inherit;font-weight:700;padding:8px 0}
+.ent{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.ent:last-child{border:0}
+.ent .t{flex:1;min-width:0}
+.ent .d{font-size:12px;color:var(--mute)}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:20px;border:1px solid var(--line);color:var(--mute);margin-inline-end:6px}
+.ent .v{font-variant-numeric:tabular-nums;direction:ltr;font-weight:600}
+.x{border:1.5px solid var(--line);background:transparent;color:var(--neg);border-radius:8px;padding:7px 10px;font:inherit;font-size:13px;min-width:38px}
+.x.arm{background:var(--neg);color:#fff;border-color:var(--neg)}
+.bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--accent)}
+.empty{text-align:center;color:var(--mute);padding:26px 10px}
+.note{font-size:12px;color:var(--mute);margin-top:14px;line-height:1.7}
+.login{max-width:380px;margin:12vh auto 0}
+.login h1{margin-bottom:6px}
+.err{color:var(--neg);font-size:14px;margin-top:10px;min-height:20px}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--bar);color:var(--bar-ink);padding:10px 16px;border-radius:10px;font-size:14px;display:none;max-width:90vw;z-index:20}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" role="status"></div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,collection,doc,onSnapshot,addDoc,deleteDoc,updateDoc,setDoc,arrayUnion,arrayRemove} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ====== الصق إعدادات Firebase بتاعتك هنا ====== */
+const firebaseConfig = {
+  apiKey: "AIzaSyCziVS6NWWaM8G6gms5qMjdW7VUmfEuXdg",
+  authDomain: "el-motahedaa.firebaseapp.com",
+  projectId: "el-motahedaa",
+  storageBucket: "el-motahedaa.firebasestorage.app",
+  messagingSenderId: "994414144611",
+  appId: "1:994414144611:web:c60546741cdfd2391f1c56"
+};
+/* ============================================== */
+
+const configured = !Object.values(firebaseConfig).some(v=>String(v).includes('PASTE_HERE'));
+let app,auth,db;
+if(configured){app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app)}
+
+const $=id=>document.getElementById(id);
+const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36);
+const today=()=>new Date().toISOString().slice(0,10);
+const fmt=n=>{const a=Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});return n<0?'('+a+')':a};
+const num=s=>{s=String(s||'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/٫/g,'.').replace(/,/g,'');const v=parseFloat(s);return isNaN(v)?0:v};
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const cls=n=>n<0?'neg':'';
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',3500)}
+async function run(fn){try{await fn()}catch(e){console.error(e);toast(e.code==='permission-denied'?'مفيش صلاحية. تأكد من تسجيل الدخول وقواعد Firestore.':'حصل خطأ، جرب تاني.')}}
+
+const CK=['أعمال منفذة','خامات','سلفة','خصم/غرامة','أخرى','دفعة'];
+const CEXP=['خامات','سلفة','خصم/غرامة','أخرى'];
+const PK=['خامات','مصنعية','نثريات','مستخلص','دفعة مصنعية','تحصيل مستخلص'];
+
+let D={project:'حسابات المشروع',contractors:[],items:[]};
+let user=null,loginErr='',unsubs=[];
+const ui={tab:'c',open:null,adding:false};
+
+const sum=(en,kinds)=>(en||[]).filter(x=>kinds.includes(x.kind)).reduce((a,x)=>a+x.val,0);
+function cCalc(c){
+  const works=sum(c.entries,['أعمال منفذة']),exp=sum(c.entries,CEXP),paid=sum(c.entries,['دفعة']);
+  return{contract:c.contract,works,exp,paid,bal:works-exp-paid,rem:c.contract-works,pct:c.contract?works/c.contract:0};
+}
+function iCalc(i){
+  const mat=sum(i.entries,['خامات']),lab=sum(i.entries,['مصنعية']),misc=sum(i.entries,['نثريات']),
+        ext=sum(i.entries,['مستخلص']),labPay=sum(i.entries,['دفعة مصنعية']),col=sum(i.entries,['تحصيل مستخلص']);
+  const cost=mat+lab+misc;
+  return{contract:i.contract,mat,lab,misc,cost,ext,profit:ext-cost,labRem:lab-labPay,extRem:ext-col,pct:i.contract?ext/i.contract:0};
+}
+const total=(list,f)=>{const t={};list.forEach(x=>{const c=f(x);for(const k in c)t[k]=(t[k]||0)+c[k]});return t};
+const tile=(l,v,sign)=>`<div><div class="lbl">${l}</div><div class="v ${sign?(v<0?'neg':v>0?'pos':''):''}">${fmt(v)}</div></div>`;
+
+/* ---------- auth + live data ---------- */
+if(configured){
+  onAuthStateChanged(auth,u=>{
+    user=u;unsubs.forEach(f=>f());unsubs=[];
+    if(u){
+      const sortC=(a,b)=>(a.created||0)-(b.created||0);
+      unsubs.push(onSnapshot(collection(db,'contractors'),s=>{D.contractors=s.docs.map(d=>({id:d.id,...d.data()})).sort(sortC);render()},e=>run(()=>{throw e})));
+      unsubs.push(onSnapshot(collection(db,'items'),s=>{D.items=s.docs.map(d=>({id:d.id,...d.data()})).sort(sortC);render()},e=>run(()=>{throw e})));
+      unsubs.push(onSnapshot(doc(db,'settings','main'),s=>{if(s.exists())D.project=s.data().project||D.project;render()}));
+    }
+    render(true);
+  });
+}
+async function doLogin(){
+  loginErr='';
+  try{await signInWithEmailAndPassword(auth,$('em').value.trim(),$('pw').value)}
+  catch(e){loginErr='الإيميل أو الباسورد غلط.';render()}
+}
+function logout(){signOut(auth)}
+
+/* ---------- render ---------- */
+const FIELDS=['n1','n2','n3','ek','ed','ev','edt'];
+function render(reset){
+  const root=$('app');
+  if(!configured){root.innerHTML=`<div class="login"><h1>محتاج إعداد</h1><p class="note">افتح الملف والصق إعدادات Firebase مكان كلمة PASTE_HERE.</p></div>`;return}
+  if(!user){
+    root.innerHTML=`<div class="login card"><h1>حسابات المقاولين</h1><div class="lbl" style="color:var(--mute);font-size:14px">سجل دخول عشان تشوف الحسابات</div>
+      <label>الإيميل</label><input id="em" type="email" autocomplete="username" dir="ltr">
+      <label>الباسورد</label><input id="pw" type="password" autocomplete="current-password" dir="ltr">
+      <button class="btn" id="lg">دخول</button><div class="err">${esc(loginErr)}</div></div>`;
+    $('lg').onclick=doLogin;$('pw').onkeydown=e=>{if(e.key==='Enter')doLogin()};return;
+  }
+  const keep={};let af=null;
+  if(!reset){FIELDS.forEach(i=>{const e=$(i);if(e)keep[i]=e.value});af=document.activeElement&&document.activeElement.id}
+  let h=`<header><div class="top"><h1>${esc(D.project)}</h1><button class="mini" onclick="renameProject()">تعديل الاسم</button><button class="mini" onclick="logout()">خروج</button></div><div class="tabs">
+    <button class="${ui.tab==='c'?'on':''}" onclick="go('c')">حسابات المقاولين</button>
+    <button class="${ui.tab==='i'?'on':''}" onclick="go('i')">حسابات الشركة</button></div></header>`;
+  if(ui.tab==='c') h+=ui.open?cDetail():cList(); else h+=ui.open?iDetail():iList();
+  h+=`<p class="note">البيانات متزامنة لحظيًا بين كل المستخدمين. الرصيد بين أقواس معناه أن المقاول استلم أكثر من مستحقه.</p>`;
+  root.innerHTML=h;
+  for(const i in keep){const e=$(i);if(e)e.value=keep[i]}
+  if(af){const e=$(af);if(e&&e.focus)e.focus()}
+}
+function go(t){ui.tab=t;ui.open=null;ui.adding=false;render(true)}
+function openIt(id){ui.open=id;ui.adding=false;render(true);scrollTo(0,0)}
+function back(){ui.open=null;render(true)}
+function renameProject(){const v=prompt('اسم المشروع',D.project);if(v&&v.trim())run(()=>setDoc(doc(db,'settings','main'),{project:v.trim()}))}
+
+/* ---------- contractors ---------- */
+function cList(){
+  const T=total(D.contractors,cCalc);
+  let h=`<div class="ledger"><div class="lbl">إجمالي الرصيد المستحق للمقاولين</div>
+    <div class="big ${cls(T.bal||0)}">${fmt(T.bal||0)}</div>
+    <div class="grid">${tile('قيمة التعاقدات',T.contract||0)}${tile('الأعمال المنفذة',T.works||0)}${tile('المصروفات على حسابهم',T.exp||0)}${tile('الدفعات المسددة',T.paid||0)}${tile('المتبقي من التعاقد',T.rem||0)}</div></div>`;
+  h+=D.contractors.length?D.contractors.map(c=>{const k=cCalc(c);return`<div class="row" onclick="openIt('${c.id}')"><div class="t"><div class="n">${esc(c.name)}</div><div class="s">${esc(c.item)} · تعاقد ${fmt(c.contract)}</div></div><div class="a ${cls(k.bal)}">${fmt(k.bal)}</div></div>`}).join(''):`<div class="empty">لا يوجد مقاولين. أضف أول مقاول.</div>`;
+  h+=ui.adding?`<div class="card"><h3>مقاول جديد</h3>
+    <label>اسم المقاول</label><input id="n1">
+    <div class="two"><div><label>البند (مباني، محارة...)</label><input id="n2"></div><div><label>قيمة التعاقد</label><input id="n3" inputmode="decimal"></div></div>
+    <button class="btn" onclick="addC()">حفظ المقاول</button><button class="btn ghost" onclick="ui.adding=false;render(true)">إلغاء</button></div>`
+    :`<button class="btn" onclick="ui.adding=true;render(true)">+ إضافة مقاول</button>`;
+  return h;
+}
+function addC(){
+  const name=$('n1').value.trim();if(!name){$('n1').focus();return}
+  const data={name,item:$('n2').value.trim()||'-',contract:num($('n3').value),entries:[],created:Date.now()};
+  ui.adding=false;render(true);run(()=>addDoc(collection(db,'contractors'),data));
+}
+function cDetail(){
+  const c=D.contractors.find(x=>x.id===ui.open);if(!c){ui.open=null;return cList()}
+  const k=cCalc(c);
+  let h=`<button class="back" onclick="back()">‹ رجوع</button>
+  <div class="ledger"><div class="lbl">${esc(c.name)} · ${esc(c.item)}</div>
+    <div class="big ${cls(k.bal)}">${fmt(k.bal)}</div><div class="lbl">الرصيد المستحق له</div>
+    <div class="grid">${tile('قيمة التعاقد',k.contract)}${tile('الأعمال المنفذة',k.works)}${tile('المصروفات على حسابه',k.exp)}${tile('الدفعات المسددة',k.paid)}${tile('المتبقي من التعاقد',k.rem)}</div>
+    <div class="bar"><i style="width:${Math.max(0,Math.min(100,k.pct*100))}%"></i></div><div class="lbl" style="margin-top:6px">نسبة الإنجاز ${(k.pct*100).toFixed(1)}%</div></div>`;
+  h+=entryForm(CK,'addEntry');
+  h+=entryList(c.entries||[]);
+  h+=`<button class="btn danger" onclick="arm(this,()=>delParent('${c.id}'),'اضغط تاني لحذف المقاول')">حذف المقاول</button>`;
+  return h;
+}
+
+/* ---------- company items ---------- */
+function iList(){
+  const T=total(D.items,iCalc);
+  let h=`<div class="ledger"><div class="lbl">صافي الربح / (الخسارة)</div>
+    <div class="big ${cls(T.profit||0)}">${fmt(T.profit||0)}</div>
+    <div class="grid">${tile('القيمة التعاقدية',T.contract||0)}${tile('المستخلصات',T.ext||0)}${tile('الخامات',T.mat||0)}${tile('المصنعيات',T.lab||0)}${tile('النثريات',T.misc||0)}${tile('إجمالي التكلفة',T.cost||0)}${tile('مصنعيات متبقية للدفع',T.labRem||0,1)}${tile('مستخلصات متبقية للتحصيل',T.extRem||0,1)}</div></div>`;
+  h+=D.items.length?D.items.map(i=>{const k=iCalc(i);return`<div class="row" onclick="openIt('${i.id}')"><div class="t"><div class="n">${esc(i.name)}</div><div class="s">تعاقد ${fmt(i.contract)} · تكلفة ${fmt(k.cost)}</div></div><div class="a ${cls(k.profit)}">${fmt(k.profit)}</div></div>`}).join(''):`<div class="empty">لا توجد بنود. أضف أول بند.</div>`;
+  h+=ui.adding?`<div class="card"><h3>بند جديد</h3>
+    <div class="two"><div><label>اسم البند</label><input id="n1"></div><div><label>القيمة التعاقدية</label><input id="n3" inputmode="decimal"></div></div>
+    <button class="btn" onclick="addI()">حفظ البند</button><button class="btn ghost" onclick="ui.adding=false;render(true)">إلغاء</button></div>`
+    :`<button class="btn" onclick="ui.adding=true;render(true)">+ إضافة بند</button>`;
+  return h;
+}
+function addI(){
+  const name=$('n1').value.trim();if(!name){$('n1').focus();return}
+  const data={name,contract:num($('n3').value),entries:[],created:Date.now()};
+  ui.adding=false;render(true);run(()=>addDoc(collection(db,'items'),data));
+}
+function iDetail(){
+  const i=D.items.find(x=>x.id===ui.open);if(!i){ui.open=null;return iList()}
+  const k=iCalc(i);
+  let h=`<button class="back" onclick="back()">‹ رجوع</button>
+  <div class="ledger"><div class="lbl">${esc(i.name)} · صافي الربح / (الخسارة)</div>
+    <div class="big ${cls(k.profit)}">${fmt(k.profit)}</div>
+    <div class="grid">${tile('القيمة التعاقدية',k.contract)}${tile('المستخلصات',k.ext)}${tile('الخامات',k.mat)}${tile('المصنعيات',k.lab)}${tile('النثريات',k.misc)}${tile('إجمالي التكلفة',k.cost)}${tile('مصنعيات متبقية',k.labRem,1)}${tile('مستخلصات متبقية',k.extRem,1)}</div>
+    <div class="bar"><i style="width:${Math.max(0,Math.min(100,k.pct*100))}%"></i></div><div class="lbl" style="margin-top:6px">نسبة المستخلص من التعاقد ${(k.pct*100).toFixed(1)}%</div></div>`;
+  h+=entryForm(PK,'addEntry');
+  h+=entryList(i.entries||[]);
+  h+=`<button class="btn danger" onclick="arm(this,()=>delParent('${i.id}'),'اضغط تاني لحذف البند')">حذف البند</button>`;
+  return h;
+}
+
+/* ---------- shared ---------- */
+const coll=()=>ui.tab==='c'?'contractors':'items';
+function entryForm(kinds,fn){
+  return`<div class="card"><h3>إضافة عملية</h3>
+    <label>النوع</label><select id="ek">${kinds.map(k=>`<option>${k}</option>`).join('')}</select>
+    <label>البيان</label><input id="ed">
+    <div class="two"><div><label>المبلغ</label><input id="ev" inputmode="decimal"></div><div><label>التاريخ</label><input id="edt" type="date" value="${today()}"></div></div>
+    <button class="btn" onclick="${fn}()">إضافة</button></div>`;
+}
+function addEntry(){
+  const val=num($('ev').value);if(!val){$('ev').focus();return}
+  const e={id:uid(),kind:$('ek').value,desc:$('ed').value.trim(),val,date:$('edt').value||today()};
+  $('ev').value='';$('ed').value='';
+  run(()=>updateDoc(doc(db,coll(),ui.open),{entries:arrayUnion(e)}));
+}
+function delEntry(id){
+  const p=(ui.tab==='c'?D.contractors:D.items).find(x=>x.id===ui.open);if(!p)return;
+  const e=(p.entries||[]).find(x=>x.id===id);if(!e)return;
+  run(()=>updateDoc(doc(db,coll(),ui.open),{entries:arrayRemove(e)}));
+}
+function delParent(id){const c=coll();ui.open=null;render(true);run(()=>deleteDoc(doc(db,c,id)))}
+function entryList(en){
+  if(!en.length)return`<div class="empty">لا توجد عمليات بعد.</div>`;
+  const s=[...en].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  return`<div class="card"><h3>العمليات (${en.length})</h3>`+s.map(x=>`<div class="ent"><div class="t"><div><span class="tag">${esc(x.kind)}</span>${esc(x.desc)}</div><div class="d">${esc(x.date)}</div></div><div class="v">${fmt(x.val)}</div><button class="x" aria-label="حذف" onclick="arm(this,()=>delEntry('${x.id}'),'تأكيد؟')">✕</button></div>`).join('')+`</div>`;
+}
+function arm(btn,fn,msg){
+  if(btn.dataset.a){fn();return}
+  const old=btn.textContent;btn.dataset.a=1;btn.textContent=msg;btn.classList.add('arm');
+  setTimeout(()=>{if(btn.isConnected){delete btn.dataset.a;btn.textContent=old;btn.classList.remove('arm')}},3000);
+}
+
+if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+Object.assign(window,{ui,render,go,openIt,back,renameProject,addC,addI,addEntry,delEntry,delParent,arm,logout});
+render(true);
+</script>
+</body>
+</html>
