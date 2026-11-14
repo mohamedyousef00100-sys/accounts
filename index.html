@@ -106,6 +106,8 @@ const PK=['خامات','مصنعية','نثريات','مستخلص','دفعة م
 
 let D={project:'حسابات المشروع',contractors:[],items:[],log:[]};
 const ADMINS=['goodbado@yahoo.com'];
+const EDITORS=['mohamedaboarab251@gmail.com'];
+const canEditEntries=()=>!!(user&&user.email&&(ADMINS.includes(user.email.toLowerCase())||EDITORS.includes(user.email.toLowerCase())));
 const isAdmin=()=>!!(user&&user.email&&ADMINS.includes(user.email.toLowerCase()));
 const who=e=>String(e||'').split('@')[0]||'-';
 const fdt=t=>{try{return new Date(t).toLocaleString('en-GB',{dateStyle:'short',timeStyle:'short'})}catch(x){return''}};
@@ -206,7 +208,7 @@ function cDetail(){
     <div class="bar"><i style="width:${Math.max(0,Math.min(100,k.pct*100))}%"></i></div><div class="lbl" style="margin-top:6px">نسبة الإنجاز ${(k.pct*100).toFixed(1)}%</div></div>`;
   h+=entryForm(CK,'addEntry');
   h+=entryList(c.entries||[]);
-  if(isAdmin())h+=`<button class="btn danger" onclick="arm(this,()=>delParent('${c.id}'),'اضغط تاني لحذف المقاول')">حذف المقاول</button>`;
+  if(canEditEntries())h+=`<button class="btn danger" onclick="arm(this,()=>delParent('${c.id}'),'اضغط تاني لحذف المقاول')">حذف المقاول</button>`;
   return h;
 }
 
@@ -238,7 +240,7 @@ function iDetail(){
     <div class="bar"><i style="width:${Math.max(0,Math.min(100,k.pct*100))}%"></i></div><div class="lbl" style="margin-top:6px">نسبة المستخلص من التعاقد ${(k.pct*100).toFixed(1)}%</div></div>`;
   h+=entryForm(PK,'addEntry');
   h+=entryList(i.entries||[]);
-  if(isAdmin())h+=`<button class="btn danger" onclick="arm(this,()=>delParent('${i.id}'),'اضغط تاني لحذف البند')">حذف البند</button>`;
+  if(canEditEntries())h+=`<button class="btn danger" onclick="arm(this,()=>delParent('${i.id}'),'اضغط تاني لحذف البند')">حذف البند</button>`;
   return h;
 }
 
@@ -264,17 +266,17 @@ function addEntry(){
   run(async()=>{await updateDoc(doc(db,coll(),ui.open),{entries:arrayUnion(e)});logAct('إضافة عملية',pn+' - '+e.kind+' - '+fmt(e.val)+(e.desc?' - '+e.desc:''))});
 }
 function delEntry(id){
-  if(!isAdmin()){toast('الحذف للأدمن فقط');return}
+  if(!canEditEntries()){toast('مفيش صلاحية حذف العمليات');return}
   const p=(ui.tab==='c'?D.contractors:D.items).find(x=>x.id===ui.open);if(!p)return;
   const e=(p.entries||[]).find(x=>x.id===id);if(!e)return;
   run(async()=>{await updateDoc(doc(db,coll(),ui.open),{entries:arrayRemove(e)});logAct('حذف عملية',p.name+' - '+e.kind+' - '+fmt(e.val)+(e.desc?' - '+e.desc:''))});
 }
-function delParent(id){if(!isAdmin()){toast('الحذف للأدمن فقط');return}
+function delParent(id){if(!canEditEntries()){toast('مفيش صلاحية الحذف');return}
   const c=coll();const p=(c==='contractors'?D.contractors:D.items).find(x=>x.id===id);const pn=p?p.name:'';ui.open=null;render(true);run(async()=>{await deleteDoc(doc(db,c,id));logAct(c==='contractors'?'حذف مقاول':'حذف بند',pn)})}
 function entryList(en){
   if(!en.length)return`<div class="empty">لا توجد عمليات بعد.</div>`;
   const s=[...en].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
-  return`<div class="card"><h3>العمليات (${en.length})</h3>`+s.map(x=>`<div class="ent"><div class="t"><div><span class="tag">${esc(x.kind)}</span>${esc(x.desc)}</div><div class="d">${esc(x.date)}${x.by?' · '+esc(who(x.by)):''}</div></div><div class="v">${fmt(x.val)}</div>${isAdmin()?`<button class="x" aria-label="حذف" onclick="arm(this,()=>delEntry('${x.id}'),'تأكيد؟')">✕</button>`:''}</div>`).join('')+`</div>`;
+  return`<div class="card"><h3>العمليات (${en.length})</h3>`+s.map(x=>`<div class="ent"><div class="t"><div><span class="tag">${esc(x.kind)}</span>${esc(x.desc)}</div><div class="d">${esc(x.date)}${x.by?' · '+esc(who(x.by)):''}</div></div><div class="v">${fmt(x.val)}</div>${canEditEntries()?`<button class="x" aria-label="حذف" onclick="arm(this,()=>delEntry('${x.id}'),'تأكيد؟')">✕</button>`:''}</div>`).join('')+`</div>`;
 }
 function arm(btn,fn,msg){
   if(btn.dataset.a){fn();return}
